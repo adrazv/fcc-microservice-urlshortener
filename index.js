@@ -8,6 +8,11 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 
+//---MY NOTE: added body-parser middleware => this allow us to read data from POST requests (req.body)
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+//---
+
 app.use('/public', express.static(`${process.cwd()}/public`));
 
 app.get('/', function(req, res) {
