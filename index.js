@@ -8,12 +8,14 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 
-//---MY NOTE: added body-parser middleware => this allow us to read data from POST requests (req.body)
+//---MY NOTE: (step 1) added body-parser middleware 
+//--- => this allow us to read data from POST requests (req.body)
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 //---
 
-//---MY NOTE: in-memory storage for URLs and a counter
+//---MY NOTE: (step 2) in-memory storage for URLs and a counter
+//---Using a simple array and a counter to map IDs to URLs
 let urlDatabase = [];
 let idCounter = 1;
 //---
@@ -29,7 +31,8 @@ app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
 
-//---MY NOTE: route to POST and shorten the URL with simplified regex
+//---MY NOTE: (step 2) route to POST and shorten the URL with simplified regex
+//---Validates the format, stores it, and returns the short_url ID
 app.post('/api/shorturl', function(req, res) {
 
       const originalUrl = req.body.url;
@@ -50,6 +53,23 @@ app.post('/api/shorturl', function(req, res) {
         short_url: shortUrl
       });
 
+});
+//---
+
+//---MY NOTE: (step 3) GET short URL redirect
+//--- Finds the original URL by ID and redirects the user
+app.get('/api/shorturl/:short_url', function(req, res) {
+
+      const shortUrlParam = req.params.short_url;
+      const foundUrl = urlDatabase.find(
+        item => item.short_url === parseInt(shortUrlParam)
+      );
+
+      if (foundUrl) {
+        return res.redirect(foundUrl.original_url);
+      } else {
+        return res.json({ error: 'No short URL found for the given input'});
+      }
 });
 //---
 
