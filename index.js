@@ -38,7 +38,7 @@ app.post('/api/shorturl', function(req, res) {
       const originalUrl = req.body.url;
 
       // simplified regex: checks if it starts with http:// or https://
-      const urlRegex = /^http:?\/\/.+/;
+      const urlRegex = /^https?:\/\/.+/;
 
       if (!urlRegex.test(originalUrl)) {
         return res.json({ error: 'invalid url'});
