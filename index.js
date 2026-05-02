@@ -65,7 +65,7 @@ app.post('/api/shorturl', function(req, res) {
 
       try {
 
-            const parseUrl = new URL(originalUrl);
+            const parsedUrl = new URL(originalUrl);
 
             // only accept http or https
             if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
