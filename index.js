@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const dns = require('dns'); // <-- ADDED to validate domain
 const app = express();
 
 // Basic Configuration
@@ -33,6 +34,8 @@ app.get('/api/hello', function(req, res) {
 
 //---MY NOTE: (step 2) route to POST and shorten the URL with simplified regex
 //---Validates the format, stores it, and returns the short_url ID
+/*
+// => the code below is not using dns.lookup
 app.post('/api/shorturl', function(req, res) {
 
       const originalUrl = req.body.url;
@@ -52,7 +55,43 @@ app.post('/api/shorturl', function(req, res) {
         original_url: originalUrl,
         short_url: shortUrl
       });
+});
+*/
+//---CHANGE HERE: replaced regex with URL + dns.lookup validation
+app.post('/api/shorturl', function(req, res) {
 
+      const originalUrl = req.body.url;
+
+
+      try {
+
+            const parseUrl = new URL(originalUrl);
+
+            // only accept http or https
+            if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+              return res.json({ error: 'invalid url'});
+            }
+
+            // validate if the domain exists
+            dns.lookup(parsedUrl.hostname, (err) =>{
+
+                if (err) {
+                  return res.json({ error: 'invalid url' });
+                }
+
+                const shortUrl = idCounter++;
+                urlDatabase.push({ original_url: originalUrl, short_url: shortUrl });
+
+                res.json({
+                  original_url: originalUrl,
+                  short_url: shortUrl
+                });
+            });
+          } 
+          
+          catch {
+                res.json({ error: 'invalid url' });
+          }
 });
 //---
 
@@ -68,7 +107,7 @@ app.get('/api/shorturl/:short_url', function(req, res) {
       if (foundUrl) {
         return res.redirect(foundUrl.original_url);
       } else {
-        return res.json({ error: 'No short URL found for the given input'});
+        return res.json({ error: 'No short URL found for the given input' });
       }
 });
 //---
